@@ -1,0 +1,18 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: my-snapshot-storage-class  # [2] The name of the volume snapshot class, CAN be changed
+driver: bs.csi.vngcloud.vn
+deletionPolicy: Delete
+parameters:
+  force-create: "false"
+---
+
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: my-snapshot-pvc  # [4] The name of the snapshot, CAN be changed
+spec:
+  volumeSnapshotClassName: my-snapshot-storage-class  # MUST match with [2]
+  source:
+    persistentVolumeClaimName: my-expansion-pvc  # MUST match with [3]
