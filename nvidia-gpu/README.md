@@ -45,3 +45,36 @@
   ![](./images/02.1.png)
 
 </center>
+
+- Until this moment, if your all action is correct, your cluster is lovely with Nvidia GPU. You can check the status of Nvidia GPU by the following command:
+  ```bash
+  kubectl -n gpu-operator get all
+  ```
+
+<center>
+
+  ![](./images/03.png)
+
+</center>
+
+- The `gpu-operator` will relabels some pair of key-value to the node, you can check it by the following command:
+  ```bash
+  kubectl get nodes <gpu-node> -oyaml
+  ```
+
+<center>
+
+  ![](./images/04.png)
+
+</center>
+
+- Using `helm list repo -A` to get the status of Nvidia GPU:
+  ```bash
+  helm list repo -A
+  ```
+
+<center>
+
+  ![](./images/05.png)
+
+</center>
