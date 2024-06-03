@@ -84,11 +84,11 @@
   kubectl -n gpu-operator exec nvidia-driver-daemonset-<random-string> -- nvidia-smi 
   ```
 
-<center>
+  <center>
 
-  ![](./images/06.png)
+    ![](./images/06.png)
 
-</center>
+  </center>
 
   > **Note**: 
   > - **Multi-Instance GPU** (aka ***MIG***) is a greate feature of Nvidia GPU using Ampere architecture. But in this guideline, my node is using RTX 2080Ti.
