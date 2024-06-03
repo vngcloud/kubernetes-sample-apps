@@ -137,4 +137,10 @@
   
   </center>
 
-  
+### 3.2. Time slicing and GPU sharing
+- The NVIDIA GPU Operator enables oversubscription of GPUs through a set of extended options for the NVIDIA Kubernetes Device Plugin. GPU time-slicing enables workloads that are scheduled on oversubscribed GPUs to interleave with one another.
+
+- Update the node label:
+  ```bash
+  kubectl label node <node-name> nvidia.com/device-plugin.config=rtx-2080ti
+  ```
