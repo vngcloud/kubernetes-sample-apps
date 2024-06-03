@@ -78,3 +78,23 @@
   ![](./images/05.png)
 
 </center>
+
+- Use can using `nvidia-smi` on the node which is integrated with Nvidia GPU. The `gpu-operator` use `DaemonSet` to deploy the `nvidia-driver` to the node. You can check the status of `DaemonSet` by the following command:
+  ```bash
+  kubectl -n gpu-operator exec nvidia-driver-daemonset-<random-string> -- nvidia-smi 
+  ```
+
+<center>
+
+  ![](./images/06.png)
+
+</center>
+
+  > **Note**: 
+  > - **Multi-Instance GPU** (aka ***MIG***) is a greate feature of Nvidia GPU using Ampere architecture. But in this guideline, my node is using RTX 2080Ti.
+  > - This page lists entire the Nvidia products that support MIG feature [https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html) _(ref 2024-06-03)_.
+  > <center>
+  > 
+  >    ![](./images/07.png)
+  > 
+  > </center>
