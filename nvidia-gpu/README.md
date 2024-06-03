@@ -8,7 +8,8 @@
 **Table of Contents**
 
 - [1. Introduction](#1-introduction)
-
+- [2. Install `gpu-operator` of Nvidia on VKS clusters](#2-install-gpu-operator-of-nvidia-on-vks-clusters)
+- [3. Deploy a GPU workload on VKS clusters](#3-deploy-a-gpu-workload-on-vks-clusters)
 
 
 ## 1. Introduction
@@ -98,3 +99,42 @@
   >    ![](./images/07.png)
   > 
   > </center>
+
+## 3. Deploy a GPU workload on VKS clusters
+### 3.1. Verify the Nvidia GPU - Running sample CUDA workloads
+- Get the GPU profile:
+  ```bash
+  kubectl get node -o json | jq '.items[].metadata.labels' | grep "nvidia.com"
+  ```
+  <center>
+
+    ![](./images/08.png)
+
+  </center>
+
+- Let’s run a simple CUDA sample, in this case vectorAdd by requesting a GPU resource as you would normally do in Kubernetes. In this case, Kubernetes will schedule the pod using a nodeSelector to direct the pod to be scheduled on the node.
+  ```bash
+  cat << EOF | kubectl create -f -
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: cuda-vectoradd
+  spec:
+    restartPolicy: OnFailure
+    containers:
+    - name: vectoradd
+      image: vcr.vngcloud.vn/81-vks-public/samples:vectoradd-cuda11.2.1
+      resources:
+        limits:
+          nvidia.com/gpu: 1                               # Use 1 GPU for this pod
+    nodeSelector:
+      nvidia.com/gpu.product: NVIDIA-GeForce-RTX-2080-Ti  # Please make sure compatible with your GPU when using this nodeSelector
+  EOF
+  ```
+  <center>
+
+    ![](./images/09.png)
+  
+  </center>
+
+  
