@@ -34,14 +34,14 @@
 
 </center>
 
-- Create the `gpu-operator` namespace to allocate all resources for Nvidia GPU:
+- Install Nvidia `gpu-operator` using the below commands (Helm 3+ is required):
   ```bash
-  kubectl create namespace gpu-operator
+  helm install nvidia-gpu-operator --wait --version v24.3.0 \
+      -n gpu-operator --create-namespace \
+      oci://vcr.vngcloud.vn/81-vks-public/vks-helm-charts/gpu-operator
   ```
-
 <center>
 
-  ![](./images/02.png)
+  ![](./images/02.1.png)
 
 </center>
-
