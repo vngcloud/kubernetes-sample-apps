@@ -144,3 +144,9 @@
   ```bash
   kubectl label node <node-name> nvidia.com/device-plugin.config=rtx-2080ti
   ```
+
+  <center>
+
+    ![](./images/10.1.png)
+
+  </center>
