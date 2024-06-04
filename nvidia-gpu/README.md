@@ -10,6 +10,8 @@
 - [1. Introduction](#1-introduction)
 - [2. Install `gpu-operator` of Nvidia on VKS clusters](#2-install-gpu-operator-of-nvidia-on-vks-clusters)
 - [3. Deploy a GPU workload on VKS clusters](#3-deploy-a-gpu-workload-on-vks-clusters)
+  - [3.1. Verify the Nvidia GPU - Running sample CUDA workloads](#31-verify-the-nvidia-gpu---running-sample-cuda-workloads)
+  - [3.2. Time slicing and GPU sharing](#32-time-slicing-and-gpu-sharing)
 
 
 ## 1. Introduction
@@ -144,9 +146,85 @@
   ```bash
   kubectl label node <node-name> nvidia.com/device-plugin.config=rtx-2080ti
   ```
+  ![](./images/10.1.png)
 
-  <center>
 
-    ![](./images/10.1.png)
+#### 3.2.1. Applying One Cluster-Wide Configuration
+- Perform the following steps to configure **GPU time-slicing** if you **already installed** the GPU operator and want to **apply the same time-slicing configuration on all nodes** in the cluster.
+- Create a file, such as [time-slicing-config-all.yaml](./manifest/time-slicing-config-all.yaml), with contents like the following example:
+  ```yaml
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: time-slicing-config-all
+  data:
+    any: |-                          # Just for human-readable purpose
+      version: v1
+      flags:
+        migStrategy: none            # Disable MIG, MUST be none in the case your GPU is not supported MIG
+      sharing:
+        timeSlicing:
+          resources:
+          - name: nvidia.com/gpu     # Only apply for the node with the node.status contains 'nvidia.com/gpu'
+            replicas: 4              # Allow 4 pods to share the GPU
+  ```
 
-  </center>
+- Apply the configuration:
+  ```bash
+  kubectl -n gpu-operator create -f time-slicing-config-all.yaml
+  ```
+  ![](./images/11.1.png)
+
+- Update the `ClusterPolicy` to use this time-slicing configuration:
+  ```bash
+  kubectl patch clusterpolicies.nvidia.com/cluster-policy \
+    -n gpu-operator --type merge \
+    -p '{"spec": {"devicePlugin": {"config": {"name": "time-slicing-config-all", "default": "any"}}}}'
+  ```
+  ![](./images/12.1.png)
+
+- Until this step, all the above stuff will make your cluster CAN share the GPU with 4 pods. You can check that GPU work well by running a new Deployment of cuda testing image, this is the example Deployment manifest:
+  ```yaml
+  # File: time-slicing-verification.yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: time-slicing-verification
+    labels:
+      app: time-slicing-verification
+  spec:
+    replicas: 5
+    selector:
+      matchLabels:
+        app: time-slicing-verification
+    template:
+      metadata:
+        labels:
+          app: time-slicing-verification
+      spec:
+        tolerations:
+          - key: nvidia.com/gpu                # Only apply for the node with the node.status contains 'nvidia.com/gpu'
+            operator: Exists
+            effect: NoSchedule
+        hostPID: true
+        containers:
+          - name: cuda-sample-vector-add
+            image: "vcr.vngcloud.vn/81-vks-public/cuda-sample:vectoradd-cuda11.7.1-ubuntu20.04"
+            command: ["/bin/bash", "-c", "--"]
+            args:
+              - while true; do /cuda-samples/vectorAdd; done
+            resources:
+              limits:
+                nvidia.com/gpu: 1              # Use 1 GPU for this pod
+  ```
+- This deployment will create 5 pods, each pod will run the `vectorAdd` CUDA sample in an infinite loop. The pods will be scheduled on the node with the GPU, and the GPU will be shared among the pods. But following the previous time slicing configuration, only 4 pods can run concurrently on the GPU so the 5th pod will be in the `Pending` state.
+  ```bash
+  kubectl apply -f time-slicing-verification.yaml
+  ```
+  ![](./images/13.png)
+
+- You can check the status of the pods by running the following command:
+  ```bash
+  kubectl get pods -owide
+  ```
+  ![](./images/14.png)

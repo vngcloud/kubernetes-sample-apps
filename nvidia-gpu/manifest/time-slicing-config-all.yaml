@@ -1,3 +1,5 @@
+# File: time-slicing-config-all.yaml
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,9 +8,10 @@ data:
   any: |-
     version: v1
     flags:
-      migStrategy: none
+      migStrategy: none            # Disable MIG, MUST be none in the case your GPU is not supported MIG
     sharing:
       timeSlicing:
         resources:
-        - name: nvidia.com/gpu
-          replicas: 4
+        - name: nvidia.com/gpu     # Only apply for the node with the node.status contains 'nvidia.com/gpu'
+          replicas: 4              # Allow 4 pods to share the GPU
+          
