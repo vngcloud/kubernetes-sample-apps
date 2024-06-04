@@ -232,3 +232,7 @@
   kubectl get pods -owide
   ```
   ![](./images/14.png)
+
+#### 3.2.2. Applying Multiple Node-Specific Configurations
+- An alternative to applying one cluster-wide configuration is to specify **multiple time-slicing configurations** in the `ConfigMap` and to **apply labels** node-by-node to control which configuration is applied to which nodes.
+- In this guideline, I add a new RTX-4090 into the cluster
