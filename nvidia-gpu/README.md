@@ -150,6 +150,10 @@
 
 
 #### 3.2.1. Applying One Cluster-Wide Configuration
+> **🚨 NOTE**:
+> - Please remove all label `nvidia.com/device-plugin.config` from all nodes before applying this configuration. Otherwise, 2 pods `node-feature-discovery` and `nvidia-device-plugin-daemonset` will be in the `Pending` state.
+> ![](./images/15.png)
+
 - Perform the following steps to configure **GPU time-slicing** if you **already installed** the GPU operator and want to **apply the same time-slicing configuration on all nodes** in the cluster.
 - Create a file, such as [time-slicing-config-all.yaml](./manifest/time-slicing-config-all.yaml), with contents like the following example:
   ```yaml
