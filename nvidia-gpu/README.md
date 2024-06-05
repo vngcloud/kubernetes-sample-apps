@@ -294,7 +294,7 @@
   kubectl get clusterpolicy
   ```
   ![](./images/19.png)
-- And final step, apply the `Deployment` to verify the time-slicing configuration:
+- And final step, apply the `Deployment` [time-slicing-verification.yaml](./manifest/time-slicing-verification.yaml) to verify the time-slicing configuration:
   ```bash
   kubectl apply -f time-slicing-verification.yaml
   kubectl get pods -owide
