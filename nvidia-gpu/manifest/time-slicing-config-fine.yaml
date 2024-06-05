@@ -3,30 +3,21 @@ kind: ConfigMap
 metadata:
   name: time-slicing-config-fine
 data:
-  a100-40gb: |-
+  rtx-4090: |-                                  # Same the name with the name that you label the GPU node before
     version: v1
     flags:
-      migStrategy: mixed
+      migStrategy: none                         # MIG strategy is not used, this field SHOULD depends on your GPU model
     sharing:
       timeSlicing:
         resources:
         - name: nvidia.com/gpu
-          replicas: 8
-        - name: nvidia.com/mig-1g.5gb
-          replicas: 2
-        - name: nvidia.com/mig-2g.10gb
-          replicas: 2
-        - name: nvidia.com/mig-3g.20gb
-          replicas: 3
-        - name: nvidia.com/mig-7g.40gb
-          replicas: 7
-  rtx-2080ti: |-
+          replicas: 10                          # Allow the node using this GPU to be shared by 10 pods
+  rtx-2080ti: |-                                # Same the name with the name that you label the GPU node before
     version: v1
     flags:
-      migStrategy: none
+      migStrategy: none                         # MIG strategy is not used, this field SHOULD depends on your GPU model
     sharing:
       timeSlicing:
         resources:
         - name: nvidia.com/gpu
-          replicas: 5
-          
+          replicas: 5                           # Allow the node using this GPU to be shared by 5 pods

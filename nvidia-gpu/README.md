@@ -235,4 +235,62 @@
 
 #### 3.2.2. Applying Multiple Node-Specific Configurations
 - An alternative to applying one cluster-wide configuration is to specify **multiple time-slicing configurations** in the `ConfigMap` and to **apply labels** node-by-node to control which configuration is applied to which nodes.
-- In this guideline, I add a new RTX-4090 into the cluster
+- In this guideline, I add a new RTX-4090 into the cluster.
+- This configuration should be greate if your cluster have multiple nodes with different GPU models. For example:
+  - NodeGroup 1 includes the instance of GPU RTX 2080Ti.
+  - NodeGroup 2 includes the instance of GPU RTX 4090.
+- So this is my cluster after adding the new node to emulate the above scenario:
+  ```bash
+  kubectl get nodes -owide
+  ```
+  ![](./images/16.png)
+
+- So **first step**, I need to label for the GPU nodes in my cluster, this is a really **IMPORTANT** step.
+  ```bash
+  kubectl label node <node-name> nvidia.com/device-plugin.config=rtx-2080ti
+  kubectl label node <node-name> nvidia.com/device-plugin.config=rtx-4090
+  ```
+  ![](./images/17.png)
+
+- The **second step**, I need to configure a `ConfigMap`, the purpose of this one is to define the time-slicing configuration for each GPU model. This is an example of the `ConfigMap`,file `time-slicing-config-fine.yaml`:
+  ```yaml
+  # File: time-slicing-config-fine.yaml
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: time-slicing-config-fine
+  data:
+    rtx-4090: |-                                  # Same the name with the name that you label the GPU node before
+      version: v1
+      flags:
+        migStrategy: none                         # MIG strategy is not used, this field SHOULD depends on your GPU model
+      sharing:
+        timeSlicing:
+          resources:
+          - name: nvidia.com/gpu
+            replicas: 10                          # Allow the node using this GPU to be shared by 10 pods
+    rtx-2080ti: |-                                # Same the name with the name that you label the GPU node before
+      version: v1
+      flags:
+        migStrategy: none                         # MIG strategy is not used, this field SHOULD depends on your GPU model
+      sharing:
+        timeSlicing:
+          resources:
+          - name: nvidia.com/gpu
+            replicas: 5                           # Allow the node using this GPU to be shared by 5 pods
+  ```
+
+  ```bash
+  kubectl create -n gpu-operator -f time-slicing-config-fine.yaml
+  ```
+  ![](./images/18.png)
+
+- And it also like the section [3.2.1](#321-applying-one-cluster-wide-configuration), the **third step** is to update the `ClusterPolicy` to use this time-slicing configuration, and then check the `ClusterPolicy` is updated successfully by the following command:
+  ```bash
+  kubectl patch clusterpolicies.nvidia.com/cluster-policy \
+    -n gpu-operator --type merge \
+    -p '{"spec": {"devicePlugin": {"config": {"name": "time-slicing-config-fine"}}}}'
+
+  kubectl get clusterpolicy
+  ```
+  ![](./images/19.png)
