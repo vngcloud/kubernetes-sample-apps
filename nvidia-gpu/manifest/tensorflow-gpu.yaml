@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorflow-gpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tensorflow-gpu
+  template:
+    metadata:
+      labels:
+        app: tensorflow-gpu
+    spec:
+      containers:
+      - name: tensorflow
+        image: vks.vngcloud.vn/60108-cuongdm3/tensorflow:2.16.1-gpu
+        command: ["python", "-c", "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"]
+        resources:
+          limits:
+            nvidia.com/gpu: 1

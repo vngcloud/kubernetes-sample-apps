@@ -1,28 +1,44 @@
-apiVersion: apps/v1
-kind: Deployment
+kind: Pod
+apiVersion: v1
 metadata:
-  name: cast-ai-gpu-test
-  labels:
-    app: cast-ai-gpu-test
+  name: gpu-pod
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: cast-ai-gpu-test
-  template:
-    metadata:
-      labels:
-        app: cast-ai-gpu-test
-    spec:
-      tolerations:
-      - key: nvidia.com/gpu              # Only apply for the node with the node.status contains 'nvidia.com/gpu'
-        operator: Exists
-        effect: NoSchedule
-      containers:
-      - name: my-gpu-container
-        image: "vcr.vngcloud.vn/60108-cuongdm3/cuda-vector-add:v0.1"
-        resources:
-          requests:
-            nvidia.com/gpu: 1
-          limits:
-            nvidia.com/gpu: 1
+  tolerations:
+  - key: nvidia.com/gpu              # Only apply for the node with the node.status contains 'nvidia.com/gpu'
+    operator: Exists
+    effect: NoSchedule
+  containers:
+  - name: gpu-container
+    image: tensorflow/tensorflow:latest-gpu
+    imagePullPolicy: Always
+    command: ["python"]
+    args: ["-u", "-c", "import tensorflow"]
+    resources:
+      requests:
+        nvidia.com/gpu: 1
+      limits:
+        nvidia.com/gpu: 1                               # Use 1 GPU for this pod
+    volumeMounts:
+    - name: nvidia-driver-375-26
+      mountPath: /usr/local/nvidia
+      readOnly: true
+    - name: libcuda-so
+      mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so
+    - name: libcuda-so-1
+      mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+    - name: libcuda-so-375-26
+      mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.375.26
+  restartPolicy: Never
+  volumes:
+  - name: nvidia-driver-375-26
+    hostPath:
+      path: /var/lib/nvidia-docker/volumes/nvidia_driver/375.26
+  - name: libcuda-so
+    hostPath:
+      path: /usr/lib/x86_64-linux-gnu/libcuda.so
+  - name: libcuda-so-1
+    hostPath:
+      path: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+  - name: libcuda-so-375-26
+    hostPath:
+      path: /usr/lib/x86_64-linux-gnu/libcuda.so.375.26
