@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-ai-gpu-test
+  labels:
+    app: cast-ai-gpu-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cast-ai-gpu-test
+  template:
+    metadata:
+      labels:
+        app: cast-ai-gpu-test
+    spec:
+      tolerations:
+      - key: nvidia.com/gpu              # Only apply for the node with the node.status contains 'nvidia.com/gpu'
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: my-gpu-container
+        image: "vcr.vngcloud.vn/60108-cuongdm3/cuda-vector-add:v0.1"
+        resources:
+          requests:
+            nvidia.com/gpu: 1
+          limits:
+            nvidia.com/gpu: 1

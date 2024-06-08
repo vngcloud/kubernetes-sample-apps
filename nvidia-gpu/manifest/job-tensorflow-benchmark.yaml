@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tf-benchmark
+spec:
+  template:
+    spec:
+      containers:
+      - name: tf-benchmark
+        image: vcr.vngcloud.vn/60108-cuongdm3/tensorflow:latest-gpu
+        command: ["python"]
+        args: ["/tensorflow/tensorflow/tools/benchmark/benchmark_model.py", "--num_gpus=1"]
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+      restartPolicy: OnFailure
