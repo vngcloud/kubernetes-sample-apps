@@ -41,7 +41,8 @@
   ```bash
   helm install nvidia-gpu-operator --wait --version v24.3.0 \
       -n gpu-operator --create-namespace \
-      oci://vcr.vngcloud.vn/81-vks-public/vks-helm-charts/gpu-operator
+      oci://vcr.vngcloud.vn/81-vks-public/vks-helm-charts/gpu-operator \
+      --set dcgmExporter.serviceMonitor.enabled=true
   ```
 <center>
 
