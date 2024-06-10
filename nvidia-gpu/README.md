@@ -301,3 +301,48 @@
   kubectl get pods -owide
   ```
   ![](./images/20.png)
+
+
+## 4. Monitoring
+- Install **Prometheus Stack** using Helm:
+  ```bash
+  helm install --wait prometheus-stack \
+    --namespace prometheus --create-namespace \
+    oci://vcr.vngcloud.vn/81-vks-public/vks-helm-charts/kube-prometheus-stack \
+    --version 60.0.2 \
+    --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
+  ```
+
+- Install **Prometheus Adapter** using Helm:
+  ```bash
+  prometheus_service=$(kubectl get svc -n prometheus -lapp=kube-prometheus-stack-prometheus -ojsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
+  helm install --wait prometheus-adapter \
+    --namespace prometheus --create-namespace \
+    oci://vcr.vngcloud.vn/81-vks-public/vks-helm-charts/prometheus-adapter \
+    --version 4.10.0 \
+    --set prometheus.url=http://${prometheus_service}.prometheus.svc.cluster.local
+  ```
+
+- Verify that the metrics are being scraped by Prometheus:
+  ```bash
+  kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq -r . | grep DCGM
+  ```
+  ![](./images/25.png)
+
+- Or using Prometheus Dashboard to get the possible metrics:
+  ```bash
+  kubectl -n prometheus port-forward svc/prometheus-stack-kube-prom-prometheus 9090:9090
+  ```
+  ![](./images/27.png)
+  - And access `http://localhost:9090` to get the Prometheus Dashboard.
+    ![](./images/28.png)
+
+- Install **Keda** using Helm:
+  ```bash
+  helm install --wait kedacore \
+    --namespace keda --create-namespace \
+    oci://vcr.vngcloud.vn/81-vks-public/vks-helm-charts/keda \
+    --version 2.14.2
+  ```
+  ![](./images/26.png)
+
