@@ -346,3 +346,43 @@
   ```
   ![](./images/26.png)
 
+## 5. Autoscaling GPU nodes with Keda
+- Apply the manifest `time-slicing-verification.yaml` to create a Deployment with 5 replicas.
+  ```bash
+  kubeclt apply -f time-slicing-verification.yaml
+  ```
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: scaled-object
+spec:
+  scaleTargetRef:
+    name: time-slicing-verification
+  minReplicaCount: 1   # Optional. Default: 0
+  maxReplicaCount: 3 # Optional. Default: 100
+  triggers:
+    - type: prometheus
+      metadata: # prometheus-stack-kube-prom-prometheus
+        serverAddress: http://prometheus-stack-kube-prom-prometheus.prometheus.svc.cluster.local:9090
+        metricName: engine_active
+        query: sum(DCGM_FI_DEV_GPU_UTIL) / count(DCGM_FI_DEV_GPU_UTIL) / 100
+        threshold: '0.03'
+    - type: prometheus
+      metadata: # prometheus-stack-kube-prom-prometheus
+        serverAddress: http://prometheus-stack-kube-prom-prometheus.prometheus.svc.cluster.local:9090
+        metricName: engine_active
+        query: sum(DCGM_FI_DEV_MEM_COPY_UTIL) / count(DCGM_FI_DEV_MEM_COPY_UTIL) / 100
+        threshold: '0.03'
+```
+
+## 6. Metrics server
+- Install **Metrics Server** using Helm:
+  ```bash
+  helm install --wait metrics-server \
+    --namespace monitoring --create-namespace \
+    oci://vcr.vngcloud.vn/81-vks-public/vks-helm-charts/metrics-server \
+    --version 3.12.1 \
+    --set args[0]="--kubelet-insecure-tls"
+  ```

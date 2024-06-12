@@ -1,0 +1,25 @@
+####################################################################################################
+# Author: Cuong. Duong Manh
+# Description: The manifest using one pod to test cuda-vectoradd on GpuNode
+####################################################################################################
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-vectoradd
+spec:
+  restartPolicy: OnFailure
+  containers:
+  - name: vectoradd
+    image: vcr.vngcloud.vn/81-vks-public/samples:vectoradd-cuda11.2.1
+    resources:
+      requests:
+        memory: "64Mi"                                # Request 64Mi of memory
+        cpu: 100m                                      # Request 100 millicores for this pod
+        nvidia.com/gpu: 1                               # Request 1 GPU for this pod
+      limits:
+        memory: "128Mi"                                # Limit the pod to 128Mi of memory
+        cpu: 200m                                      # Limit the pod to 100 millicores
+        nvidia.com/gpu: 1                               # Use 1 GPU for this pod
+  nodeSelector:
+    nvidia.com/gpu.product: NVIDIA-GeForce-RTX-2080-Ti
