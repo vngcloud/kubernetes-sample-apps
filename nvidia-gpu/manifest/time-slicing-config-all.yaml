@@ -1,9 +1,13 @@
-# File: time-slicing-config-all.yaml
+####################################################################################################
+# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
+# Description: This is the configmap for time slicing feature. It allows multiple pods to share the GPU.
+#              The number of pods that can share the GPU is defined by the 'replicas' field.
+####################################################################################################
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: time-slicing-config-all
+  name: gpu-sharing-config
 data:
   any: |-
     version: v1
@@ -14,4 +18,3 @@ data:
         resources:
         - name: nvidia.com/gpu     # Only apply for the node with the node.status contains 'nvidia.com/gpu'
           replicas: 4              # Allow 4 pods to share the GPU
-          
