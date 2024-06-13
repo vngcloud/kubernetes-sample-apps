@@ -22,7 +22,7 @@ spec:
       containers:
       - name: tensorflow
         image: vcr.vngcloud.vn/60108-cuongdm3/tensorflow:2.16.1-gpu
-        command: ["python", "-c", "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000000, 1000000])))"]
+        command: ["python", "-c", "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([100000, 100000])))"]
         resources:
           limits:
             cpu: 700m
