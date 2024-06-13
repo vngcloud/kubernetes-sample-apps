@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gpu-sharing-config
+data:
+  rtx-2080ti: |-                                # Same the name with the name that you label the GPU node before
+    version: v1
+    flags:
+      migStrategy: none                         # MIG strategy is not used, this field SHOULD depends on your GPU model
+    sharing:
+      timeSlicing:
+        resources:
+        - name: nvidia.com/gpu
+          replicas: 4                           # Allow the node using this GPU to be shared by 4 pods
+  rtx-4090: |-                                  # Same the name with the name that you label the GPU node before
+    version: v1
+    flags:
+      migStrategy: none                         # MIG strategy is not used, this field SHOULD depends on your GPU model
+    sharing:
+      mps:
+        resources:
+        - name: nvidia.com/gpu
+          replicas: 8                           # Allow the node using this GPU to be shared by 8 pods
