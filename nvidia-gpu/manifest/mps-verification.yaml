@@ -1,0 +1,29 @@
+####################################################################################################
+# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
+# Description: This is the configmap for MPS feature. It allows multiple pods to share the GPU.
+####################################################################################################
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nbody-sample
+spec:
+  completions: 5
+  parallelism: 5
+  template:
+    spec:
+      hostIPC: true
+      tolerations:
+        - key: nvidia.com/gpu              # Only apply for the node with the node.status contains 'nvidia.com/gpu'
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: nbody-sample
+          image: vcr.vngcloud.vn/60108-cuongdm3/samples:nbody
+          command: ["/tmp/nbody"]
+          args: ["-benchmark", "-i=5000"]
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+      restartPolicy: "Never"
+  backoffLimit: 1
