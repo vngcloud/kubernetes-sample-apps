@@ -1,0 +1,32 @@
+####################################################################################################
+# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
+# Description: 
+#   - This is a sample manifest file to deploy a TensorFlow job on Kubernetes cluster.
+#    -The job trains a simple MNIST model using TensorFlow on NVIDIA GPUs.
+####################################################################################################
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tensorflow-mnist
+  namespace: default
+spec:
+  containers:
+  - image: vcr.vngcloud.vn/60108-cuongdm3/tensorflow-mnist-sample:v1.5
+    name: tensorflow-mnist
+    command:
+    - python
+    - tensorflow-sample-code/tfjob/docker/mnist/main.py
+    - --max_steps=100000
+    - --data_dir=tensorflow-sample-code/data
+    resources:
+      requests:
+        nvidia.com/gpu: 1                                              # Request one GPU for the pod
+        cpu: 500m
+        memory: 1000Mi
+      limits:
+        cpu: 800m
+        memory: 2000Mi
+        nvidia.com/gpu: 1                                              # Request one GPU for the pod
+    workingDir: /root
+  restartPolicy: Always
