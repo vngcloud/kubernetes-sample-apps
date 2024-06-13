@@ -1,3 +1,10 @@
+####################################################################################################
+# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
+# Description:
+#   - This is a sample manifest file to deploy a TensorFlow pod executing a simple TensorFlow code.
+#   - The code generates a random tensor and prints its sum.
+####################################################################################################
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,7 +22,10 @@ spec:
       containers:
       - name: tensorflow
         image: vks.vngcloud.vn/60108-cuongdm3/tensorflow:2.16.1-gpu
-        command: ["python", "-c", "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"]
+        command: ["python", "-c", "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000000, 1000000])))"]
         resources:
           limits:
+            cpu: 700m
+            memory: 1000Mi
             nvidia.com/gpu: 1
+
