@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gpu-sharing-config
+  name: gpu-multi-sharing-config
 data:
   rtx-2080ti: |-                                # Same the name with the name that you label the GPU node before
     version: v1
