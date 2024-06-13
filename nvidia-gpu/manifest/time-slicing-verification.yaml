@@ -1,4 +1,9 @@
-# File: time-slicing-verification.yaml
+####################################################################################################
+# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
+# Description: This is the deployment for time slicing verification. It will run a simple CUDA sample
+#              application to verify the time slicing feature.
+####################################################################################################
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,4 +33,7 @@ spec:
             - while true; do /cuda-samples/vectorAdd; done
           resources:
             limits:
+              cpu: 150m
+              memory: 100Mi
               nvidia.com/gpu: 1              # Use 1 GPU for this pod
+
