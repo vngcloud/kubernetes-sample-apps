@@ -1,0 +1,27 @@
+####################################################################################################
+# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
+# Description: This file is used to scale the GPU pod based on the GPU utilization
+####################################################################################################
+
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: scaled-object
+spec:
+  scaleTargetRef:
+    name: time-slicing-verification
+  minReplicaCount: 1   # Optional. Default: 0
+  maxReplicaCount: 3 # Optional. Default: 100
+  triggers:
+    - type: prometheus
+      metadata: # prometheus-stack-kube-prom-prometheus
+        serverAddress: http://prometheus-stack-kube-prom-prometheus.prometheus.svc.cluster.local:9090
+        metricName: engine_active
+        query: sum(DCGM_FI_DEV_GPU_UTIL) / count(DCGM_FI_DEV_GPU_UTIL) / 100
+        threshold: '0.5'
+    - type: prometheus
+      metadata: # prometheus-stack-kube-prom-prometheus
+        serverAddress: http://prometheus-stack-kube-prom-prometheus.prometheus.svc.cluster.local:9090
+        metricName: engine_active
+        query: sum(DCGM_FI_DEV_MEM_COPY_UTIL) / count(DCGM_FI_DEV_MEM_COPY_UTIL) / 100
+        threshold: '0.5'

@@ -1,0 +1,38 @@
+####################################################################################################
+# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
+# Description: This is the deployment for time slicing verification. It will run a simple CUDA sample
+#              application to verify the time slicing feature.
+####################################################################################################
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scaling-app
+  labels:
+    app: scaling-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scaling-app
+  template:
+    metadata:
+      labels:
+        app: scaling-app
+    spec:
+      tolerations:
+        - key: nvidia.com/gpu              # Only apply for the node with the node.status contains 'nvidia.com/gpu'
+          operator: Exists
+          effect: NoSchedule
+      hostPID: true
+      containers:
+        - name: cuda-sample-vector-add
+          image: "vcr.vngcloud.vn/81-vks-public/cuda-sample:vectoradd-cuda11.7.1-ubuntu20.04"
+          command: ["/bin/bash", "-c", "--"]
+          args:
+            - while true; do /cuda-samples/vectorAdd; done
+          resources:
+            limits:
+              cpu: 150m
+              memory: 100Mi
+              nvidia.com/gpu: 1              # Use 1 GPU for this pod
