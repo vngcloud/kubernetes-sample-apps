@@ -1,9 +1,3 @@
-####################################################################################################
-# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
-# Description: This is the deployment for time slicing verification. It will run a simple CUDA sample
-#              application to verify the time slicing feature.
-####################################################################################################
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
