@@ -1,10 +1,3 @@
-# Using Nvidia GPU with VKS clusters
-- ***Author***: Cuong. Duong Manh
-- ***Email***: cuongdm3@vng.com.vn
-- ***Date***: 2024-06-03
-
-<hr>
-
 **Table of Contents**
 
 - [1. Introduction](#1-introduction)
