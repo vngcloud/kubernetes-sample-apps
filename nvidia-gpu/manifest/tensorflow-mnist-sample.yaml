@@ -1,10 +1,3 @@
-####################################################################################################
-# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
-# Description: 
-#   - This is a sample manifest file to deploy a TensorFlow Deployment on Kubernetes cluster.
-#    -The job trains a simple MNIST model using TensorFlow on NVIDIA GPUs.
-####################################################################################################
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
