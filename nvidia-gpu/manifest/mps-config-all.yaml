@@ -1,9 +1,3 @@
-####################################################################################################
-# Author: Cuong. Duong Manh <cuongdm3@vng.com.vn>
-# Description: This is the configmap for MPS feature. It allows multiple pods to share the GPU.
-#              The number of pods that can share the GPU is defined by the 'replicas' field.
-####################################################################################################
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
