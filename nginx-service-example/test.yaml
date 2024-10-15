@@ -1,14 +1,22 @@
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: flowcontrol.apiserver.k8s.io/v1beta3
+kind: FlowSchema
 metadata:
-  name: deprecated-ingress
-  namespace: default
+  name: example-flow-schema
 spec:
+  priorityLevelConfiguration:
+    name: example-priority-level  # Reference to the priority level above
+  matchingPrecedence: 1000
+  distinguisherMethod:
+    type: ByUser
   rules:
-  - host: deprecated.example.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: deprecated-service
-          servicePort: 80
+    - subjects:
+        - kind: User
+          user:
+            name: "example-user"  # Replace with your desired user
+      resourceRules:
+        - verbs: ["get", "list"]
+          apiGroups: [""]
+          resources: ["pods"]
+      nonResourceRules:
+        - verbs: ["get"]
+          nonResourceURLs: ["/healthz", "/metrics"]
