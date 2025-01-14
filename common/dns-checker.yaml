@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-hosts
+data:
+  hosts: |
+    149.154.167.220 api.telegram.org
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-checker
+  labels:
+    app: dns-checker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dns-checker
+  template:
+    metadata:
+      labels:
+        app: dns-checker
+    spec:
+      containers:
+      - name: dns-checker
+        image: vcr.vngcloud.vn/60108-annd2-ingress/dns-check:0.0.0
+        imagePullPolicy: Always
+        env:
+        - name: TELEGRAM_BOT_TOKEN
+          value: "_______________________________"
+        - name: TELEGRAM_CHAT_ID
+          value: "_______________________________"
+        - name: DNS_NAMES
+          value: "kubernetes.default.svc.cluster.local,google.com,hubble-ui.kube-system.svc.cluster.local"
+        - name: CHECK_INTERVAL
+          value: "10"  # Check every 60 seconds
+        - name: DNS_TIMEOUT
+          value: "2"  # Timeout 2 seconds
+        volumeMounts:
+        - name: custom-hosts
+          mountPath: /etc/hosts
+          subPath: hosts
+      volumes:
+      - name: custom-hosts
+        configMap:
+          name: custom-hosts
